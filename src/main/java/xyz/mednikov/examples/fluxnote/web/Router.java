@@ -19,6 +19,6 @@ public class Router {
         .andRoute(PUT("/notes").and(accept(MediaType.APPLICATION_JSON)), handler::updateNote)
         .andRoute(DELETE("/note/{id}").and(accept(MediaType.APPLICATION_JSON)), handler::removeNote)
         .andRoute(GET("/note/{id}").and(accept(MediaType.APPLICATION_JSON)), handler::findNote)
-        .andRoute(GET("/notes/{userId}").and(accept(MediaType.APPLICATION_JSON)), handler::findAllNotes);
+        .andRoute(GET("/notes/{userId}").and(accept(MediaType.APPLICATION_JSON)), handler::findAllNotesAndPaginate);
     }
 }

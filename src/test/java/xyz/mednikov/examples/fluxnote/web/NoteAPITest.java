@@ -102,14 +102,40 @@ class NoteAPITest {
             new Note("id", "content", "user"),
             new Note("id", "content", "user")
         );
-        NoteList result = new NoteList(notes);
+        NoteList result = new NoteList(notes, 5);
         Mockito.when(service.findAllNotes(userId)).thenReturn(Mono.just(result));
         client.get()
         .uri(URI.create("/notes/user"))
         .accept(MediaType.APPLICATION_JSON)
         .exchange()
         .expectStatus().isOk()
+        .expectHeader().valueEquals("X-APP-PAGINATION-ENABLED", "false")
         .expectBody(NoteList.class)
         .value(r -> Assertions.assertThat(r.notes()).hasSameElementsAs(notes));
+    }
+
+    @Test
+    void findAllNotesAndPaginateTest(){
+        String userId = "user";
+        List<Note> notes = List.of(
+            new Note("id", "content", "user"),
+            new Note("id", "content", "user"),
+            new Note("id", "content", "user"),
+            new Note("id", "content", "user"),
+            new Note("id", "content", "user")
+        );
+        NoteList result = new NoteList(notes, 5);
+        Mockito.when(service.findAllNotesAndPaginate(userId,2,5)).thenReturn(Mono.just(result));
+
+        client.get().uri(builder -> builder.path("/notes/user").queryParam("page", 2).queryParam("limit", 5).build())
+        .accept(MediaType.APPLICATION_JSON)
+        .exchange()
+        .expectStatus().isOk()
+        .expectHeader().valueEquals("X-APP-PAGINATION-ENABLED", "true")
+        .expectBody(NoteList.class)
+        .value(r -> {
+            Assertions.assertThat(r.notes()).hasSameElementsAs(notes);
+            Assertions.assertThat(r.total()).isEqualTo(5);
+        });
     }
 }

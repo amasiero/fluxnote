@@ -72,4 +72,32 @@ class NoteServiceImplTest {
         .assertNext(result -> Assertions.assertThat(result.notes()).hasSize(5))
         .verifyComplete();
     }
+
+    @Test
+    void findNotesAndPaginateTest(){
+        Flux<Note> notes = Flux.just(
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user"),
+            new Note("id", "New note", "user")
+        );
+        Mockito.when(repository.findByUserId("user")).thenReturn(notes);
+        StepVerifier.create(service.findAllNotesAndPaginate("user", 2, 5))
+        .assertNext(result -> {
+            Assertions.assertThat(result.notes()).hasSize(5);
+            Assertions.assertThat(result.total()).isEqualTo(15);
+        })
+        .verifyComplete();
+    }
 }

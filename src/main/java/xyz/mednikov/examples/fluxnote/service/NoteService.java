@@ -17,4 +17,6 @@ public interface NoteService {
     Mono<Optional<Note>> findNote (String id);
 
     Mono<NoteList> findAllNotes(String userId);
+
+    Mono<NoteList> findAllNotesAndPaginate(String userId, int page, int limit);
 }
